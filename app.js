@@ -1,54 +1,50 @@
-// Get references to DOM elements
+// DOM elements
 const taskInput = document.getElementById("taskInput");
 const addTaskBtn = document.getElementById("addTaskBtn");
 const taskList = document.getElementById("taskList");
 const taskCount = document.getElementById("taskCount");
 
-let count = 0; // Track number of tasks
+let count = 0;
 
 addTaskBtn.addEventListener("click", () => {
   const taskText = taskInput.value.trim();
-
-  // Ignore empty inputs
   if (taskText === "") return;
 
-  // Create a new <li> element
-  const li = document.createElement("li");
-  li.textContent = taskText;
+  const taskItem = document.createElement("li");
 
-  // Add click-to-complete functionality
-  li.addEventListener("click", () => {
-    li.textContent = "Completed!";
-    li.appendChild(createRemoveButton(li)); // re-append remove button
+  const textSpan = document.createElement("span");
+  textSpan.textContent = taskText;
+
+  // Click to mark as completed (using replaceWith)
+  textSpan.addEventListener("click", () => {
+    const completedText = document.createElement("span");
+    completedText.textContent = "Completed!";
+    taskItem.replaceChild(completedText, textSpan);
+    taskItem.appendChild(removeBtn); // re-append remove button
   });
 
-  // Add remove button
-  li.appendChild(createRemoveButton(li));
+  const removeBtn = createRemoveButton(taskItem);
 
-  // Add the new task to the list
-  taskList.appendChild(li);
+  taskItem.appendChild(textSpan);
+  taskItem.appendChild(removeBtn);
+  taskList.appendChild(taskItem);
 
-  // Clear the input field
   taskInput.value = "";
-
-  // Update the task counter
   updateTaskCount(1);
 });
 
-// Function to create the "Remove" button
 function createRemoveButton(taskItem) {
-  const removeBtn = document.createElement("span");
-  removeBtn.textContent = "[Remove]";
+  const removeBtn = document.createElement("button");
+  removeBtn.textContent = "Remove";
   removeBtn.className = "remove-btn";
   removeBtn.onclick = (e) => {
-    e.stopPropagation(); // Prevent "Completed!" if clicked
+    e.stopPropagation(); // Prevent "Completed!" on click
     taskItem.remove();
     updateTaskCount(-1);
   };
   return removeBtn;
 }
 
-// Function to update the task counter
 function updateTaskCount(change) {
   count += change;
   taskCount.textContent = count;
